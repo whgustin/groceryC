@@ -1,56 +1,44 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState, useEffect} from 'react';
+import {Container, Row, Col} from 'reactstrap';
 import Item from './Item/Item';
 import './Items.css';
 
-const Items = () => {
+const Items = (props) => {
 
-  const fakeID = "adb5837c"
-  const fakeKey= "0f57a99f17e1004dcf049124748b0d38" 
+  const [items, setItems] = useState('');
 
-  const [items, setItems] = useState([]);
-  const [search, setSearch] = useState('');
-  const [query, setQuery] = useState('');
+  const fetchItems = () => {
+    fetch('https://littlegrocery-server.herokuapp.com/items/allitems', {
+      method: 'GET',
+      headers: new Headers ({
+          'Content-Type': 'application/json',
+          'Authorization': props.token
+      })
+    }) .then( (res) => res.json())
+      .then((logData) => {
+          setItems(logData)
+      })
+  };
 
   useEffect(() => {
-    getItems(); 
-  }, [query]); 
+    fetchItems();
+  }, [])
 
-  const getItems = async () => {
-    const response = await fetch(`https://api.edamam.com/search?q=${query}&app_id=${fakeID}&app_key=${fakeKey}`)
-    const data = await response.json();
-    setItems(data.hits);
-    console.log(data.hits);
-  };
-
-  const updateSearch = e => {
-    setSearch(e.target.value);
-  };
-
-  const getSearch = e => {
-    e.preventDefault();
-    setQuery(search)
-    setSearch('');
-  };
-
-  return (
-    <div className="Items">
-      <form onSubmit={getSearch} className="search-form">
-      <input className="search-bar" type="text" value={search} onChange={updateSearch} />
-      <button className="search-button " type="submit">Search</button>
-      </form>
-      <div className="items">
-      {items.map(item =>(
-        <Item 
-        key={item.recipe.label}
-        title={item.recipe.label} 
-        calories={item.recipe.calories} 
-        image={item.recipe.image}
-        ingredients={item.recipe.ingredients}
-        />
-      ))}
-      </div>
-    </div>
-  );
+  return(
+    <Container>
+      <Row>
+        <Col md="2">
+          <p></p>
+        </Col>
+        <Col md="9">
+          <content>{fetchItems()}</content>
+        </Col>
+        <Col md="2">
+          <p></p>
+        </Col>
+      </Row>
+    </Container>
+  )
 };
 
 export default Items

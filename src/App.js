@@ -9,7 +9,6 @@ import Recipes from './Components/Recipes/Recipes';
 import Cart from './Components/Site/Cart';
 import {
   Route,
-  Link,
   Switch
 } from 'react-router-dom';
 
@@ -39,6 +38,11 @@ function App() {
     setSessionToken('');
   }
 
+  const protectedViews = () => {
+    return (sessionToken === localStorage.getItem('token') ? <Home token={sessionToken}/>
+    : <Auth updateToken={updateToken}/>)
+  }
+
   const drawerToggleClickHandler = () => {
     setSideDrawerOpen((prevState) => {
       return{sideDrawerOpen: !prevState.sideDrawerOpen};
@@ -57,27 +61,18 @@ function App() {
 
   return (
     <div>
-      <Router>
-      <Toolbar drawerClickHandler={drawerToggleClickHandler} />
-      <SideDrawer show={sideDrawerOpen}/>
-      {backdrop}
+        <Toolbar drawerClickHandler={drawerToggleClickHandler} />
+        <SideDrawer show={sideDrawerOpen}/>
+        {backdrop}
+        {protectedViews()}
+
       {/* <Router>
       <Header clearToken={clearToken} />
       </Router> */}
-                <Switch>
-                    {/* <Route exact path="/"><Home /></Route> */}
-                    <Route exact path="/home"><Home /></Route>
-                    <Route exact path="/recipes"><Recipes /></Route>
-                    <Route exact path="/items"><Items /></Route>
-                    <Route exact path="/cart"><Cart /></Route>
-                    <Route exact path="/signin"><Auth /></Route>
-                </Switch>
-
       {/* { sessionToken ? null : <Auth updateToken={ updateToken } /> } */}
     
       {/* <Sitebar clickLogout={clearToken} /> */}
       {/* <Auth updateToken={updateToken} /> */}
-      </Router>
     </div>
   );
 }
